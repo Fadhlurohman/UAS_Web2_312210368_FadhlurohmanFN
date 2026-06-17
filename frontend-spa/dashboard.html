@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>UAS Dashboard</title>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div id="app" class="flex">
+
+        <!-- SIDEBAR -->
+        <div class="w-64 bg-gray-900 text-white h-screen p-4">
+            <h2 class="text-xl font-bold mb-6">ADMIN PANEL</h2>
+
+            <button class="block w-full text-left mb-2" @click="loadItems">
+                Items
+            </button>
+
+            <button class="block w-full text-left text-red-400 mt-10" @click="logout">
+                Logout
+            </button>
+        </div>
+
+        <!-- MAIN -->
+        <div class="flex-1 p-6">
+
+            <h1 class="text-2xl font-bold mb-4">Dashboard Items</h1>
+
+            <!-- STATISTIK -->
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="bg-white p-4 shadow rounded">
+                    <p>Total Items</p>
+                    <h2 class="text-xl font-bold">{{ items.length }}</h2>
+                </div>
+            </div>
+
+            <!-- BUTTON ADD -->
+            <button @click="openModal" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">
+                + Tambah Item
+            </button>
+
+            <!-- TABLE -->
+            <table class="w-full bg-white shadow">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="p-2">Nama</th>
+                        <th>Stock</th>
+                        <th>Category</th>
+                        <th>Supplier</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr v-for="item in items" :key="item.id">
+                        <td class="p-2">{{ item.item_name }}</td>
+                        <td>{{ item.stock }}</td>
+                        <td>{{ item.category_name }}</td>
+                        <td>{{ item.supplier_name }}</td>
+
+                        <td>
+                            <button @click="editItem(item)" class="text-blue-500">Edit</button>
+                            <button @click="deleteItem(item.id)" class="text-red-500 ml-2">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- MODAL -->
+            <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+
+                <div class="bg-white p-6 rounded w-96">
+
+                    <h2 class="text-lg font-bold mb-2">
+                        {{ form.id ? 'Edit Item' : 'Tambah Item' }}
+                    </h2>
+
+                    <input v-model="form.item_name" placeholder="Item Name" class="border p-2 w-full mb-2">
+
+                    <input v-model="form.stock" type="number" placeholder="Stock" class="border p-2 w-full mb-2">
+
+                    <input v-model="form.category_id" placeholder="Category ID" class="border p-2 w-full mb-2">
+
+                    <input v-model="form.supplier_id" placeholder="Supplier ID" class="border p-2 w-full mb-2">
+
+                    <div class="flex justify-between">
+                        <button @click="saveItem" class="bg-green-500 text-white px-3 py-1 rounded">
+                            Save
+                        </button>
+
+                        <button @click="closeModal" class="bg-gray-400 text-white px-3 py-1 rounded">
+                            Close
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+
+        // AUTO TOKEN
+        axios.interceptors.request.use((config) => {
+            const token = localStorage.getItem('token');
+            if (token) config.headers.Authorization = 'Bearer ' + token;
+            return config;
+        });
+
+        // PROTECTION LOGIN
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'index.html';
+        }
+
+        const App = {
+            data() {
+                return {
+                    items: [],
+                    showModal: false,
+                    form: {
+                        id: null,
+                        item_name: '',
+                        stock: '',
+                        category_id: '',
+                        supplier_id: ''
+                    }
+                }
+            },
+
+            mounted() {
+                this.loadItems();
+            },
+
+            methods: {
+
+                // GET
+                async loadItems() {
+                    const res = await axios.get('http://localhost:8080/items');
+                    this.items = res.data;
+                },
+
+                // OPEN MODAL
+                openModal() {
+                    this.resetForm();
+                    this.showModal = true;
+                },
+
+                closeModal() {
+                    this.showModal = false;
+                },
+
+                // CREATE / UPDATE
+                async saveItem() {
+                    if (this.form.id) {
+                        await axios.put(`http://localhost:8080/items/${this.form.id}`, this.form);
+                    } else {
+                        await axios.post('http://localhost:8080/items', this.form);
+                    }
+
+                    this.closeModal();
+                    this.loadItems();
+                },
+
+                // EDIT
+                editItem(item) {
+                    this.form = { ...item };
+                    this.showModal = true;
+                },
+
+                // DELETE
+                async deleteItem(id) {
+                    await axios.delete(`http://localhost:8080/items/${id}`);
+                    this.loadItems();
+                },
+
+                // RESET
+                resetForm() {
+                    this.form = {
+                        id: null,
+                        item_name: '',
+                        stock: '',
+                        category_id: '',
+                        supplier_id: ''
+                    };
+                },
+
+                // LOGOUT
+                logout() {
+                    localStorage.removeItem('token');
+                    window.location.href = 'index.html';
+                }
+
+            }
+        };
+
+        Vue.createApp(App).mount('#app');
+
+    </script>
+
+</body>
+
+</html>
