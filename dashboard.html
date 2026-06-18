@@ -1,102 +1,340 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
-    <title>UAS Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Inventory Dashboard</title>
     <script src="https://unpkg.com/vue@3"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-100">
 
-    <div id="app" class="flex">
+    <div id="app" class="flex h-screen overflow-hidden">
 
         <!-- SIDEBAR -->
-        <div class="w-64 bg-gray-900 text-white h-screen p-4">
-            <h2 class="text-xl font-bold mb-6">ADMIN PANEL</h2>
+        <div class="w-64 bg-gray-900 text-white flex flex-col justify-between p-4 shadow-xl">
+            <div>
+                <div class="flex items-center space-x-3 mb-8 px-2 py-3 border-b border-gray-800">
+                    <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white text-lg font-bold">
+                        E
+                    </div>
+                    <h2 class="text-xl font-bold tracking-wider text-indigo-400">ADMIN PANEL</h2>
+                </div>
 
-            <button class="block w-full text-left mb-2" @click="loadItems">
-                Items
-            </button>
+                <nav class="space-y-2">
+                    <button 
+                        class="flex items-center w-full text-left py-3 px-4 rounded-xl transition duration-200 font-medium"
+                        :class="currentTab === 'items' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
+                        @click="switchTab('items')"
+                    >
+                        <i class="fas fa-box w-5 mr-3 text-lg"></i> Items
+                    </button>
 
-            <button class="block w-full text-left text-red-400 mt-10" @click="logout">
-                Logout
-            </button>
+                    <button 
+                        class="flex items-center w-full text-left py-3 px-4 rounded-xl transition duration-200 font-medium"
+                        :class="currentTab === 'references' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-gray-400 hover:bg-gray-800 hover:text-white'"
+                        @click="switchTab('references')"
+                    >
+                        <i class="fas fa-list w-5 mr-3 text-lg"></i> Categories & Suppliers
+                    </button>
+                </nav>
+            </div>
+
+            <div>
+                <button class="flex items-center w-full text-left text-red-400 hover:text-red-300 py-3 px-4 rounded-xl hover:bg-gray-850 transition duration-200 font-medium border border-transparent hover:border-red-900/30" @click="logout">
+                    <i class="fas fa-sign-out-alt w-5 mr-3 text-lg"></i> Keluar
+                </button>
+            </div>
         </div>
 
-        <!-- MAIN -->
-        <div class="flex-1 p-6">
+        <!-- MAIN CONTENT -->
+        <div class="flex-1 flex flex-col overflow-y-auto bg-gray-50 p-8">
 
-            <h1 class="text-2xl font-bold mb-4">Dashboard Items</h1>
+            <!-- ITEMS TAB -->
+            <div v-if="currentTab === 'items'" class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Dashboard Items</h1>
+                        <p class="text-sm text-gray-500 mt-1">Kelola stok barang inventaris secara real-time</p>
+                    </div>
+                    <!-- BUTTON ADD -->
+                    <button @click="openModal" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl shadow-lg hover:shadow-indigo-500/30 transition-all font-semibold flex items-center space-x-2">
+                        <i class="fas fa-plus text-sm"></i>
+                        <span>Tambah Item</span>
+                    </button>
+                </div>
 
-            <!-- STATISTIK -->
-            <div class="grid grid-cols-3 gap-4 mb-6">
-                <div class="bg-white p-4 shadow rounded">
-                    <p>Total Items</p>
-                    <h2 class="text-xl font-bold">{{ items.length }}</h2>
+                <!-- STATISTIK -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-150 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Jenis Barang</p>
+                            <h2 class="text-3xl font-bold text-gray-800 mt-2">{{ items.length }}</h2>
+                        </div>
+                        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-500 text-xl shadow-inner">
+                            <i class="fas fa-box"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLE -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50/70 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                    <th class="p-4 pl-6">Nama Barang</th>
+                                    <th class="p-4">Stok</th>
+                                    <th class="p-4">Kategori (ID)</th>
+                                    <th class="p-4">Supplier (ID)</th>
+                                    <th class="p-4 pr-6 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="divide-y divide-gray-100 text-sm text-gray-600">
+                                <tr v-for="item in items" :key="item.id" class="hover:bg-gray-50/50 transition-colors">
+                                    <td class="p-4 pl-6 font-semibold text-gray-850">{{ item.item_name }}</td>
+                                    <td class="p-4 font-mono text-gray-700">{{ item.stock }}</td>
+                                    <td class="p-4">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
+                                                ID: {{ item.category_id }}
+                                            </span>
+                                            <span class="font-medium text-gray-700">{{ item.category_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 text-xs font-bold border border-purple-100">
+                                                ID: {{ item.supplier_id }}
+                                            </span>
+                                            <span class="font-medium text-gray-700">{{ item.supplier_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 pr-6 text-right space-x-3">
+                                        <button @click="editItem(item)" class="text-indigo-600 hover:text-indigo-900 font-semibold transition-colors">
+                                            <i class="fas fa-edit mr-1"></i> Edit
+                                        </button>
+                                        <button @click="deleteItem(item.id)" class="text-red-500 hover:text-red-800 font-semibold transition-colors">
+                                            <i class="fas fa-trash-alt mr-1"></i> Hapus
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr v-if="items.length === 0">
+                                    <td colspan="5" class="p-8 text-center text-gray-400">Tidak ada item ditemukan.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
-            <!-- BUTTON ADD -->
-            <button @click="openModal" class="bg-blue-500 text-white px-4 py-2 rounded mb-4">
-                + Tambah Item
-            </button>
+            <!-- REFERENCES TAB (CATEGORIES & SUPPLIERS) -->
+            <div v-if="currentTab === 'references'" class="space-y-6">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Kategori & Supplier</h1>
+                    <p class="text-sm text-gray-500 mt-1">Kelola data kategori dan detail partner supplier inventaris</p>
+                </div>
 
-            <!-- TABLE -->
-            <table class="w-full bg-white shadow">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="p-2">Nama</th>
-                        <th>Stock</th>
-                        <th>Category</th>
-                        <th>Supplier</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    <tr v-for="item in items" :key="item.id">
-                        <td class="p-2">{{ item.item_name }}</td>
-                        <td>{{ item.stock }}</td>
-                        <td>{{ item.category_name }}</td>
-                        <td>{{ item.supplier_name }}</td>
-
-                        <td>
-                            <button @click="editItem(item)" class="text-blue-500">Edit</button>
-                            <button @click="deleteItem(item.id)" class="text-red-500 ml-2">Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <!-- MODAL -->
-            <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-
-                <div class="bg-white p-6 rounded w-96">
-
-                    <h2 class="text-lg font-bold mb-2">
-                        {{ form.id ? 'Edit Item' : 'Tambah Item' }}
-                    </h2>
-
-                    <input v-model="form.item_name" placeholder="Item Name" class="border p-2 w-full mb-2">
-
-                    <input v-model="form.stock" type="number" placeholder="Stock" class="border p-2 w-full mb-2">
-
-                    <input v-model="form.category_id" placeholder="Category ID" class="border p-2 w-full mb-2">
-
-                    <input v-model="form.supplier_id" placeholder="Supplier ID" class="border p-2 w-full mb-2">
-
-                    <div class="flex justify-between">
-                        <button @click="saveItem" class="bg-green-500 text-white px-3 py-1 rounded">
-                            Save
-                        </button>
-
-                        <button @click="closeModal" class="bg-gray-400 text-white px-3 py-1 rounded">
-                            Close
-                        </button>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- CATEGORIES SECTION -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-tags text-indigo-500 text-lg"></i>
+                                <h2 class="text-xl font-bold text-gray-800">Daftar Kategori</h2>
+                            </div>
+                            <button @click="openCategoryModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm shadow-md hover:shadow-indigo-500/20 transition-all font-semibold flex items-center space-x-1.5">
+                                <i class="fas fa-plus text-xs"></i>
+                                <span>Kategori</span>
+                            </button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50/70 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        <th class="p-4 pl-6 w-28">Category ID</th>
+                                        <th class="p-4">Nama Kategori</th>
+                                        <th class="p-4 pr-6 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 text-sm text-gray-600">
+                                    <tr v-for="cat in categories" :key="cat.id" class="hover:bg-gray-50/50 transition-colors">
+                                        <td class="p-4 pl-6 font-bold text-indigo-600 font-mono">#{{ cat.id }}</td>
+                                        <td class="p-4 font-semibold text-gray-800">{{ cat.name }}</td>
+                                        <td class="p-4 pr-6 text-right space-x-3">
+                                            <button @click="editCategory(cat)" class="text-indigo-600 hover:text-indigo-900 font-semibold transition-colors">
+                                                <i class="fas fa-edit text-xs"></i> Edit
+                                            </button>
+                                            <button @click="deleteCategory(cat.id)" class="text-red-500 hover:text-red-800 font-semibold transition-colors">
+                                                <i class="fas fa-trash-alt text-xs"></i> Hapus
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="categories.length === 0">
+                                        <td colspan="3" class="p-8 text-center text-gray-400">Tidak ada kategori ditemukan.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
+                    <!-- SUPPLIERS SECTION -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-truck text-indigo-500 text-lg"></i>
+                                <h2 class="text-xl font-bold text-gray-800">Daftar Supplier</h2>
+                            </div>
+                            <button @click="openSupplierModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm shadow-md hover:shadow-indigo-500/20 transition-all font-semibold flex items-center space-x-1.5">
+                                <i class="fas fa-plus text-xs"></i>
+                                <span>Supplier</span>
+                            </button>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50/70 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                        <th class="p-4 pl-6 w-28">Supplier ID</th>
+                                        <th class="p-4">Nama Supplier</th>
+                                        <th class="p-4">No. Telp</th>
+                                        <th class="p-4 pr-6 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 text-sm text-gray-600">
+                                    <tr v-for="sup in suppliers" :key="sup.id" class="hover:bg-gray-50/50 transition-colors">
+                                        <td class="p-4 pl-6 font-bold text-purple-600 font-mono">#{{ sup.id }}</td>
+                                        <td class="p-4 font-semibold text-gray-850">{{ sup.name }}</td>
+                                        <td class="p-4 text-gray-500 font-medium font-mono">{{ sup.phone || '-' }}</td>
+                                        <td class="p-4 pr-6 text-right space-x-3">
+                                            <button @click="editSupplier(sup)" class="text-indigo-650 hover:text-indigo-900 font-semibold transition-colors">
+                                                <i class="fas fa-edit text-xs"></i> Edit
+                                            </button>
+                                            <button @click="deleteSupplier(sup.id)" class="text-red-500 hover:text-red-800 font-semibold transition-colors">
+                                                <i class="fas fa-trash-alt text-xs"></i> Hapus
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="suppliers.length === 0">
+                                        <td colspan="4" class="p-8 text-center text-gray-400">Tidak ada supplier ditemukan.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL ITEMS -->
+            <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-2xl shadow-xl w-96 border border-gray-100">
+                    <h2 class="text-xl font-bold mb-4 text-gray-850">
+                        {{ form.id ? 'Edit Item' : 'Tambah Item' }}
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Nama Item</label>
+                            <input v-model="form.item_name" placeholder="Masukkan nama item" class="border border-gray-200 p-2.5 w-full rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Stok</label>
+                            <input v-model="form.stock" type="number" placeholder="Masukkan jumlah stok" class="border border-gray-200 p-2.5 w-full rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Kategori</label>
+                            <select v-model="form.category_id" class="border border-gray-200 p-2.5 w-full rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white">
+                                <option value="" disabled selected>Pilih Kategori</option>
+                                <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                                    ID: {{ cat.id }} - {{ cat.name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Supplier</label>
+                            <select v-model="form.supplier_id" class="border border-gray-200 p-2.5 w-full rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 bg-white">
+                                <option value="" disabled selected>Pilih Supplier</option>
+                                <option v-for="sup in suppliers" :key="sup.id" :value="sup.id">
+                                    ID: {{ sup.id }} - {{ sup.name }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button @click="closeModal" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+                            Batal
+                        </button>
+                        <button @click="saveItem" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-indigo-600/10">
+                            Simpan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL CATEGORY -->
+            <div v-if="showCategoryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-2xl shadow-xl w-96 border border-gray-100">
+                    <h2 class="text-xl font-bold mb-4 text-gray-850">
+                        {{ categoryForm.id ? 'Edit Kategori' : 'Tambah Kategori' }}
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Nama Kategori</label>
+                            <input v-model="categoryForm.name" placeholder="Masukkan nama kategori" class="border border-gray-200 p-2.5 w-full rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button @click="closeCategoryModal" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+                            Batal
+                        </button>
+                        <button @click="saveCategory" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-indigo-600/10">
+                            Simpan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL SUPPLIER -->
+            <div v-if="showSupplierModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-2xl shadow-xl w-96 border border-gray-100">
+                    <h2 class="text-xl font-bold mb-4 text-gray-850">
+                        {{ supplierForm.id ? 'Edit Supplier' : 'Tambah Supplier' }}
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Nama Supplier</label>
+                            <input v-model="supplierForm.name" placeholder="Masukkan nama supplier" class="border border-gray-200 p-2.5 w-full rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Nomor Telepon</label>
+                            <input v-model="supplierForm.phone" placeholder="Masukkan nomor telepon" class="border border-gray-200 p-2.5 w-full rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button @click="closeSupplierModal" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+                            Batal
+                        </button>
+                        <button @click="saveSupplier" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-lg shadow-indigo-600/10">
+                            Simpan
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -120,7 +358,12 @@
         const App = {
             data() {
                 return {
+                    currentTab: 'items', // 'items' or 'references'
                     items: [],
+                    categories: [],
+                    suppliers: [],
+
+                    // Item Form Modal
                     showModal: false,
                     form: {
                         id: null,
@@ -128,57 +371,86 @@
                         stock: '',
                         category_id: '',
                         supplier_id: ''
+                    },
+
+                    // Category Form Modal
+                    showCategoryModal: false,
+                    categoryForm: {
+                        id: null,
+                        name: ''
+                    },
+
+                    // Supplier Form Modal
+                    showSupplierModal: false,
+                    supplierForm: {
+                        id: null,
+                        name: '',
+                        phone: ''
                     }
                 }
             },
 
             mounted() {
                 this.loadItems();
+                this.loadCategories();
+                this.loadSuppliers();
             },
 
             methods: {
-
-                // GET
-                async loadItems() {
-                    const res = await axios.get('http://localhost:8080/items');
-                    this.items = res.data;
+                // Tab switching helper
+                switchTab(tab) {
+                    this.currentTab = tab;
+                    if (tab === 'items') {
+                        this.loadItems();
+                    } else if (tab === 'references') {
+                        this.loadCategories();
+                        this.loadSuppliers();
+                    }
                 },
 
-                // OPEN MODAL
+                // ITEM CRUD
+                async loadItems() {
+                    try {
+                        const res = await axios.get('http://localhost:8080/items');
+                        this.items = res.data;
+                    } catch (err) {
+                        console.error('Failed to load items', err);
+                    }
+                },
                 openModal() {
                     this.resetForm();
                     this.showModal = true;
                 },
-
                 closeModal() {
                     this.showModal = false;
                 },
-
-                // CREATE / UPDATE
                 async saveItem() {
-                    if (this.form.id) {
-                        await axios.put(`http://localhost:8080/items/${this.form.id}`, this.form);
-                    } else {
-                        await axios.post('http://localhost:8080/items', this.form);
+                    try {
+                        if (this.form.id) {
+                            await axios.put(`http://localhost:8080/items/${this.form.id}`, this.form);
+                        } else {
+                            await axios.post('http://localhost:8080/items', this.form);
+                        }
+                        this.closeModal();
+                        this.loadItems();
+                    } catch (err) {
+                        console.error('Failed to save item', err);
                     }
-
-                    this.closeModal();
-                    this.loadItems();
                 },
-
-                // EDIT
                 editItem(item) {
                     this.form = { ...item };
                     this.showModal = true;
                 },
-
-                // DELETE
                 async deleteItem(id) {
-                    await axios.delete(`http://localhost:8080/items/${id}`);
-                    this.loadItems();
+                    if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
+                        try {
+                            await axios.delete(`http://localhost:8080/items/${id}`);
+                            this.loadItems();
+                        } catch (err) {
+                            console.error('Failed to delete item', err);
+                        }
+                    }
                 },
-
-                // RESET
                 resetForm() {
                     this.form = {
                         id: null,
@@ -186,6 +458,107 @@
                         stock: '',
                         category_id: '',
                         supplier_id: ''
+                    };
+                },
+
+                // CATEGORY CRUD
+                async loadCategories() {
+                    try {
+                        const res = await axios.get('http://localhost:8080/categories');
+                        this.categories = res.data;
+                    } catch (err) {
+                        console.error('Failed to load categories', err);
+                    }
+                },
+                openCategoryModal() {
+                    this.resetCategoryForm();
+                    this.showCategoryModal = true;
+                },
+                closeCategoryModal() {
+                    this.showCategoryModal = false;
+                },
+                async saveCategory() {
+                    try {
+                        if (this.categoryForm.id) {
+                            await axios.put(`http://localhost:8080/categories/${this.categoryForm.id}`, this.categoryForm);
+                        } else {
+                            await axios.post('http://localhost:8080/categories', this.categoryForm);
+                        }
+                        this.closeCategoryModal();
+                        this.loadCategories();
+                    } catch (err) {
+                        console.error('Failed to save category', err);
+                    }
+                },
+                editCategory(category) {
+                    this.categoryForm = { ...category };
+                    this.showCategoryModal = true;
+                },
+                async deleteCategory(id) {
+                    if (confirm('Apakah Anda yakin ingin menghapus kategori ini?')) {
+                        try {
+                            await axios.delete(`http://localhost:8080/categories/${id}`);
+                            this.loadCategories();
+                        } catch (err) {
+                            console.error('Failed to delete category', err);
+                        }
+                    }
+                },
+                resetCategoryForm() {
+                    this.categoryForm = {
+                        id: null,
+                        name: ''
+                    };
+                },
+
+                // SUPPLIER CRUD
+                async loadSuppliers() {
+                    try {
+                        const res = await axios.get('http://localhost:8080/suppliers');
+                        this.suppliers = res.data;
+                    } catch (err) {
+                        console.error('Failed to load suppliers', err);
+                    }
+                },
+                openSupplierModal() {
+                    this.resetSupplierForm();
+                    this.showSupplierModal = true;
+                },
+                closeSupplierModal() {
+                    this.showSupplierModal = false;
+                },
+                async saveSupplier() {
+                    try {
+                        if (this.supplierForm.id) {
+                            await axios.put(`http://localhost:8080/suppliers/${this.supplierForm.id}`, this.supplierForm);
+                        } else {
+                            await axios.post('http://localhost:8080/suppliers', this.supplierForm);
+                        }
+                        this.closeSupplierModal();
+                        this.loadSuppliers();
+                    } catch (err) {
+                        console.error('Failed to save supplier', err);
+                    }
+                },
+                editSupplier(supplier) {
+                    this.supplierForm = { ...supplier };
+                    this.showSupplierModal = true;
+                },
+                async deleteSupplier(id) {
+                    if (confirm('Apakah Anda yakin ingin menghapus supplier ini?')) {
+                        try {
+                            await axios.delete(`http://localhost:8080/suppliers/${id}`);
+                            this.loadSuppliers();
+                        } catch (err) {
+                            console.error('Failed to delete supplier', err);
+                        }
+                    }
+                },
+                resetSupplierForm() {
+                    this.supplierForm = {
+                        id: null,
+                        name: '',
+                        phone: ''
                     };
                 },
 
