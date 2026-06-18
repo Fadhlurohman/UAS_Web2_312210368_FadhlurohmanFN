@@ -80,7 +80,8 @@ Aplikasi ini merupakan sistem manajemen inventaris berbasis web yang dibangun me
 ---
 
 ## Struktur Folder Project
-'''
+
+```
 backend-api/
 │
 ├── app/
@@ -97,7 +98,8 @@ frontend-spa/
 ├── index.html
 ├── dashboard.html
 └── assets (optional)
-'''
+```
+
 ---
 
 ## Cara Menjalankan Project
@@ -119,51 +121,51 @@ frontend-spa/
 ## Endpoint API
 
 ### Authentication
-1. POST /login
+**1. POST /login**
 <img src="gambar/postman login.png">
 
 ### Items
-2. GET /items
+**2. GET /items**
 <img src="gambar/get items.png">
-3. POST /items
+**3. POST /items**
 <img src="gambar/put items.png">
-4. PUT /items/{id}
+**4. PUT /items/{id}**
 <img src="gambar/put items.png">
-5. DELETE /items/{id}
+**5. DELETE /items/{id}**
 <img src="gambar/delete items.png">
 
 ### Categories
-1. GET /categories
+**1. GET /categories**
 <img src="gambar/get categories.png">
 
 ### Suppliers
-1. GET /suppliers
+**1. GET /suppliers**
 <img src="gambar/get suppliers.png">
 
 ---
 
 ## Header Authorization
-1. Authorization: Bearer <"e4156e5aebdc2da5b13a864bd13964a921f7b0740085c71291cddd5a0e202055">
+**1. Authorization: Bearer <"e4156e5aebdc2da5b13a864bd13964a921f7b0740085c71291cddd5a0e202055">**
 <img src="gambar/Header Authorization.png">
 
 ---
 
 ## Screenshot yang Wajib Dilampirkan
-1. Halaman login
+**1. Halaman login**
 <img src="gambar/halaman login.png">
-2. Dashboard admin
+**2. Dashboard admin**
 <img src="gambar/dashboard admin.png">
-3. Tabel items
+**3. Tabel items**
 <img src="gambar/dashboard item.png">
-4. Tambah/edit data
+**4. Tambah/edit data**
 <img src="gambar/tambah item.png">
 
 <img src="gambar/edit item.png">
-5. Postman login (success)
+**5. Postman login (success)**
 <img src="gambar/postman login.png">
-6. Postman request tanpa token (401 Unauthorized)
+**6. Postman request tanpa token (401 Unauthorized)**
 <img src="gambar/postman request tanpa token (401 Unauthorized).png">
-7. Struktur database phpMyAdmin
+**7. Struktur database phpMyAdmin**
 <img src="gambar/struktur database phpmyadmin.png">
 
 ---
