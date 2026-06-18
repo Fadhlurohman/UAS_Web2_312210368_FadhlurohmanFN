@@ -44,8 +44,8 @@ Aplikasi ini merupakan sistem manajemen inventaris berbasis web yang dibangun me
 ### 3. Dashboard Admin
 - Sidebar navigation
 - Statistik jumlah items
-- Form untuk tambah,edit dan delete data
-- Form untuk tambah,edit dan delete suppliers/category
+- Form untuk tambah, edit dan delete data
+- Form untuk tambah, edit dan delete suppliers/category
 
 ### 4. Security
 - Authorization Bearer Token
@@ -142,7 +142,8 @@ frontend-spa/
 ---
 
 ## Header Authorization
-Authorization: Bearer <e4156e5aebdc2da5b13a864bd13964a921f7b0740085c71291cddd5a0e202055>
+- Authorization: Bearer <"e4156e5aebdc2da5b13a864bd13964a921f7b0740085c71291cddd5a0e202055">
+<img src="gambar/Header Authorization.png">
 
 ---
 
@@ -153,7 +154,7 @@ Authorization: Bearer <e4156e5aebdc2da5b13a864bd13964a921f7b0740085c71291cddd5a0
 <img src="gambar/dashboard admin.png">
 - Tabel items
 <img src="gambar/dashboard item.png">
-- tambah/edit data
+- Tambah/edit data
 <img src="gambar/tambah item.png">
 <img src="gambar/edit item.png">
 - Postman login (success)
