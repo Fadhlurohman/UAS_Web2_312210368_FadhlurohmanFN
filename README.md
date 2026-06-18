@@ -1,9 +1,7 @@
 # UAS Web 2 - Sistem Manajemen Inventaris (E-Inventory)
 
 ## Deskripsi Proyek
-Aplikasi ini merupakan sistem manajemen inventaris berbasis web yang dibangun menggunakan arsitektur decoupled (frontend dan backend terpisah). Backend menggunakan CodeIgniter 4 sebagai RESTful API server, sedangkan frontend menggunakan VueJS 3 SPA dengan TailwindCSS.
-
-Sistem ini mengelola data barang, kategori, dan supplier dengan fitur autentikasi berbasis token (Bearer Token).
+Aplikasi ini merupakan sistem manajemen inventaris berbasis web yang dibangun menggunakan arsitektur decoupled (frontend dan backend terpisah). Backend menggunakan CodeIgniter 4 sebagai RESTful API server, sedangkan frontend menggunakan VueJS 3 SPA dengan TailwindCSS. Sistem ini mengelola data barang, kategori, dan supplier dengan fitur autentikasi berbasis token (Bearer Token).
 
 ---
 
@@ -46,8 +44,8 @@ Sistem ini mengelola data barang, kategori, dan supplier dengan fitur autentikas
 ### 3. Dashboard Admin
 - Sidebar navigation
 - Statistik jumlah items
-- Modal form untuk tambah/edit data
-- Tabel data dinamis
+- Form untuk tambah,edit dan delete data
+- Form untuk tambah,edit dan delete suppliers/category
 
 ### 4. Security
 - Authorization Bearer Token
@@ -121,47 +119,50 @@ frontend-spa/
 
 ### Authentication
 - POST /login
+<img src="gambar/postman login.png">
 
 ### Items
 - GET /items
+<img src="gambar/get items.png">
 - POST /items
+<img src="gambar/put items.png">
 - PUT /items/{id}
+<img src="gambar/put items.png">
 - DELETE /items/{id}
+<img src="gambar/delete items.png">
 
 ### Categories
 - GET /categories
+<img src="gambar/get categories.png">
 
 ### Suppliers
 - GET /suppliers
+<img src="gambar/get suppliers.png">
 
 ---
 
-## Contoh Header Authorization
-Authorization: Bearer <token>
+## Header Authorization
+Authorization: Bearer <e4156e5aebdc2da5b13a864bd13964a921f7b0740085c71291cddd5a0e202055>
 
 ---
 
 ## Screenshot yang Wajib Dilampirkan
-
 - Halaman login
+<img src="gambar/halaman login.png">
 - Dashboard admin
+<img src="gambar/dashboard admin.png">
 - Tabel items
-- Modal tambah/edit data
+<img src="gambar/dashboard item.png">
+- tambah/edit data
+<img src="gambar/tambah item.png">
+<img src="gambar/edit item.png">
 - Postman login (success)
+<img src="gambar/postman login.png">
 - Postman request tanpa token (401 Unauthorized)
+<img src="gambar/postman request tanpa token (401 Unauthorized).png">
 - Struktur database phpMyAdmin
-
----
-
-## Link Demo
-- http://localhost/frontend-spa/index.html
+<img src="gambar/struktur database phpmyadmin.png">
 
 ---
 
 ## Link Video Presentasi
-- 
-
----
-
-## Kesimpulan
-Aplikasi ini berhasil mengimplementasikan arsitektur decoupled modern dengan backend REST API dan frontend SPA, serta menerapkan autentikasi berbasis token dan CRUD lengkap.
