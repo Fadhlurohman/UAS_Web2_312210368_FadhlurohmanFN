@@ -127,10 +127,13 @@ frontend-spa/
 ### Items
 **2. GET /items**
 <img src="gambar/get items.png">
+
 **3. POST /items**
 <img src="gambar/put items.png">
+
 **4. PUT /items/{id}**
 <img src="gambar/put items.png">
+
 **5. DELETE /items/{id}**
 <img src="gambar/delete items.png">
 
@@ -153,18 +156,24 @@ frontend-spa/
 ## Screenshot yang Wajib Dilampirkan
 **1. Halaman login**
 <img src="gambar/halaman login.png">
+
 **2. Dashboard admin**
 <img src="gambar/dashboard admin.png">
+
 **3. Tabel items**
 <img src="gambar/dashboard item.png">
-**4. Tambah/edit data**
-<img src="gambar/tambah item.png">
 
+**4. Tambah/edit data**
+
+<img src="gambar/tambah item.png">
 <img src="gambar/edit item.png">
+
 **5. Postman login (success)**
 <img src="gambar/postman login.png">
+
 **6. Postman request tanpa token (401 Unauthorized)**
 <img src="gambar/postman request tanpa token (401 Unauthorized).png">
+
 **7. Struktur database phpMyAdmin**
 <img src="gambar/struktur database phpmyadmin.png">
 
