@@ -11,6 +11,7 @@ class SupplierModel extends Model
 
     protected $allowedFields = [
         'name',
-        'phone'
+        'phone',
+        'category_id'
     ];
 }

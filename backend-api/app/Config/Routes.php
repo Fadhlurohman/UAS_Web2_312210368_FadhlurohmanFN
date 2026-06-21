@@ -6,6 +6,7 @@ use CodeIgniter\Router\RouteCollection;
 
 $routes->get('/', 'Home::index');
 $routes->get('test', 'Test::index');
+$routes->get('public-summary', 'ItemController::publicSummary');
 
 /*
 |--------------------------------------------------------------------------
@@ -18,32 +19,46 @@ $routes->options('(:any)', 'LoginController::test');
 
 /*
 |--------------------------------------------------------------------------
-| Categories (TIDAK DIPROTEKSI)
+| Categories (GET Publik, POST/PUT/DELETE Proteksi)
 |--------------------------------------------------------------------------
 */
 $routes->get('categories', 'CategoryController::index');
-$routes->post('categories', 'CategoryController::create');
-$routes->put('categories/(:num)', 'CategoryController::update/$1');
-$routes->delete('categories/(:num)', 'CategoryController::delete/$1');
+$routes->group('categories', ['filter' => 'auth'], function($routes) {
+    $routes->post('/', 'CategoryController::create');
+    $routes->put('(:num)', 'CategoryController::update/$1');
+    $routes->delete('(:num)', 'CategoryController::delete/$1');
+});
 
 /*
 |--------------------------------------------------------------------------
-| Suppliers (TIDAK DIPROTEKSI)
+| Suppliers (GET Publik, POST/PUT/DELETE Proteksi)
 |--------------------------------------------------------------------------
 */
 $routes->get('suppliers', 'SupplierController::index');
-$routes->post('suppliers', 'SupplierController::create');
-$routes->put('suppliers/(:num)', 'SupplierController::update/$1');
-$routes->delete('suppliers/(:num)', 'SupplierController::delete/$1');
+$routes->group('suppliers', ['filter' => 'auth'], function($routes) {
+    $routes->post('/', 'SupplierController::create');
+    $routes->put('(:num)', 'SupplierController::update/$1');
+    $routes->delete('(:num)', 'SupplierController::delete/$1');
+});
 
 /*
 |--------------------------------------------------------------------------
-| ITEMS (WAJIB TOKEN / PROTECTED)
+| ITEMS
 |--------------------------------------------------------------------------
 */
+$routes->get('items', 'ItemController::index');
 $routes->group('items', ['filter' => 'auth'], function($routes) {
-    $routes->get('/', 'ItemController::index');
     $routes->post('/', 'ItemController::create');
     $routes->put('(:num)', 'ItemController::update/$1');
     $routes->delete('(:num)', 'ItemController::delete/$1');
+});
+
+/*
+|--------------------------------------------------------------------------
+| STOCKS
+|--------------------------------------------------------------------------
+|*/
+$routes->get('stocks', 'StockController::index');
+$routes->group('stocks', ['filter' => 'auth'], function($routes) {
+    $routes->post('/', 'StockController::create');
 });

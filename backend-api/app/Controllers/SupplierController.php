@@ -10,7 +10,11 @@ class SupplierController extends ResourceController
     public function index()
     {
         $model = new SupplierModel();
-        return $this->respond($model->findAll());
+        $data = $model
+            ->select('suppliers.*, categories.name as category_name')
+            ->join('categories', 'categories.id = suppliers.category_id', 'left')
+            ->findAll();
+        return $this->respond($data);
     }
 
     public function create()
@@ -20,8 +24,9 @@ class SupplierController extends ResourceController
         $data = $this->request->getJSON();
 
         $model->insert([
-            'name'  => $data->name,
-            'phone' => $data->phone
+            'name'        => $data->name,
+            'phone'       => $data->phone,
+            'category_id' => $data->category_id ?: null
         ]);
 
         return $this->respondCreated([
@@ -36,8 +41,9 @@ class SupplierController extends ResourceController
         $data = $this->request->getJSON();
 
         $model->update($id, [
-            'name'  => $data->name,
-            'phone' => $data->phone
+            'name'        => $data->name,
+            'phone'       => $data->phone,
+            'category_id' => $data->category_id ?: null
         ]);
 
         return $this->respond([
@@ -49,10 +55,16 @@ class SupplierController extends ResourceController
     {
         $model = new SupplierModel();
 
-        $model->delete($id);
-
-        return $this->respond([
-            'message' => 'Supplier berhasil dihapus'
-        ]);
+        try {
+            $model->delete($id);
+            return $this->respond([
+                'message' => 'Supplier berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            if (strpos($e->getMessage(), 'foreign key constraint fails') !== false || $e->getCode() == 1451) {
+                return $this->fail('Gagal menghapus: Supplier ini masih terhubung dengan data barang (items) di inventaris. Hapus atau ubah terlebih dahulu barang yang menggunakan supplier ini.', 409);
+            }
+            return $this->fail('Gagal menghapus supplier: ' . $e->getMessage(), 500);
+        }
     }
 }

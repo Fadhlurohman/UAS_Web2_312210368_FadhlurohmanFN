@@ -43,10 +43,16 @@ class CategoryController extends ResourceController
     {
         $model = new CategoryModel();
 
-        $model->delete($id);
-
-        return $this->respond([
-            'message' => 'Category berhasil dihapus'
-        ]);
+        try {
+            $model->delete($id);
+            return $this->respond([
+                'message' => 'Category berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            if (strpos($e->getMessage(), 'foreign key constraint fails') !== false || $e->getCode() == 1451) {
+                return $this->fail('Gagal menghapus: Kategori ini masih terhubung dengan data barang (items) di inventaris. Hapus atau ubah terlebih dahulu barang yang menggunakan kategori ini.', 409);
+            }
+            return $this->fail('Gagal menghapus kategori: ' . $e->getMessage(), 500);
+        }
     }
 }

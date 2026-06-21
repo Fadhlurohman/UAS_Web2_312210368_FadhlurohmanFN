@@ -1,22 +1,182 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Inventory</title>
+    <title>E-Inventory - Sistem Manajemen Inventaris Pintar</title>
+    <meta name="description" content="Aplikasi monitoring stok barang gudang terintegrasi. Kelola inventaris cepat & presisi dengan E-Inventory.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        /* v-cloak: hide until Vue compiles */
+        [v-cloak] { display: none !important; }
+
+        /* Body background radial gradient */
+        body {
+            background: radial-gradient(circle at 20% 20%, #1e1b4b 0%, #0f172a 40%, #020617 100%);
+        }
+
+        /* Ambient blob decorations */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+        body::before {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+            top: -10%; right: 10%;
+            animation: float-blob-1 12s infinite alternate ease-in-out;
+        }
+        body::after {
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+            bottom: 5%; left: 10%;
+            animation: float-blob-2 15s infinite alternate ease-in-out;
+        }
+
+        /* Keyframe animations */
+        @keyframes float-blob-1 {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-50px, 30px) scale(1.15); }
+        }
+        @keyframes float-blob-2 {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, -40px) scale(0.9); }
+        }
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @keyframes card-appear {
+            0%   { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse-ring {
+            0%   { transform: scale(1);   opacity: 0.8; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        .animate-fade-in     { animation: fade-in    0.8s ease-out forwards; }
+        .animate-card-appear { animation: card-appear 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        /* Nav link hover underline */
+        .nav-link { position: relative; }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0; height: 2px;
+            bottom: -4px; left: 0;
+            background-color: #6366f1;
+            transition: width 0.2s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+
+        /* Pulse dot ring animation */
+        .pulse-dot { position: relative; }
+        .pulse-dot::after {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            top: 0; left: 0;
+            background-color: #10b981;
+            border-radius: 50%;
+            animation: pulse-ring 1.5s infinite ease-in-out;
+        }
+
+        /* Activity icon type colors */
+        .activity-icon-wrapper.add      { background: rgba(16,185,129,0.1);  color: #34d399; }
+        .activity-icon-wrapper.stock    { background: rgba(245,158,11,0.1);  color: #fbbf24; }
+        .activity-icon-wrapper.supplier { background: rgba(59,130,246,0.1);  color: #60a5fa; }
+        .activity-icon-wrapper.category { background: rgba(139,92,246,0.1);  color: #a78bfa; }
+
+        /* FAQ accordion transition */
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+            padding: 0 24px;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding-bottom: 20px;
+            transition: max-height 0.3s cubic-bezier(0.95, 0.05, 0.795, 0.035);
+        }
+        .faq-item:hover,
+        .faq-item.active { border-color: rgba(99,102,241,0.5) !important; background: rgba(15,23,42,0.85) !important; }
+        .faq-item.active .faq-question i { color: #6366f1; }
+
+        /* Popular plan CTA hover */
+        .btn-popular:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(99,102,241,0.4);
+        }
+
+        /* Custom Scrollbar for Dark Theme */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+    </style>
 </head>
+<body class="min-h-screen overflow-x-hidden overflow-y-auto text-slate-50 font-sans">
 
-<body>
+    <div id="app" v-cloak></div>
 
-    <div id="app"></div>
+    <!-- ── 1. Page Components ───────────────────────────────────────────────── -->
+    <script src="components/Home.js?v=1.17"></script>
+    <script src="components/NotFound.js?v=1.17"></script>
+    <script src="components/Login.js?v=1.17"></script>
+    <script src="components/Dashboard.js?v=1.17"></script>
+    <script src="components/Categories.js?v=1.17"></script>
+    <script src="components/Suppliers.js?v=1.17"></script>
+    <script src="components/StockTransactions.js?v=1.17"></script>
+    <script src="components/Reports.js?v=1.17"></script>
+    <script src="components/Alerts.js?v=1.17"></script>
+    <script src="components/Profile.js?v=1.17"></script>
 
-    <script src="login.js"></script>
+    <!-- ── 2. Axios Interceptors + Base URL ─────────────────────────────────── -->
+    <script src="axios-setup.js?v=1.17"></script>
+
+    <!-- ── 3. Vue Router + Navigation Guards ────────────────────────────────── -->
+    <script src="router.js?v=1.17"></script>
+
+    <!-- ── 4. Root Vue App (mounts to #app) ─────────────────────────────────── -->
+    <script src="app.js?v=1.17"></script>
 
 </body>
-
 </html>
