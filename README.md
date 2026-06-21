@@ -1,182 +1,225 @@
-# UAS Web 2 - Sistem Manajemen Inventaris (E-Inventory)
+# UAS Pemrograman Web 2 - Sistem Manajemen Inventaris Pintar (E-Inventory)
 
-## Deskripsi Proyek
-Aplikasi ini merupakan sistem manajemen inventaris berbasis web yang dibangun menggunakan arsitektur decoupled (frontend dan backend terpisah). Backend menggunakan CodeIgniter 4 sebagai RESTful API server, sedangkan frontend menggunakan VueJS 3 SPA dengan TailwindCSS. Sistem ini mengelola data barang, kategori, dan supplier dengan fitur autentikasi berbasis token (Bearer Token).
-
----
-
-## Teknologi yang Digunakan
-
-### Backend
-- PHP 8+
-- CodeIgniter 4
-- MySQL / MariaDB
-- RESTful API
-- JWT-like Token Authentication (custom token)
-
-### Frontend
-- VueJS 3 (CDN)
-- Axios
-- TailwindCSS (CDN)
-- SPA (Single Page Application)
+- **Nama:** Fadhlurohman Fatikh Navintino
+- **NIM:** 312210368
+- **Mata Kuliah:** Pemrograman Web 2 (UAS)
 
 ---
 
-## Fitur Aplikasi
+Aplikasi ini merupakan **Sistem Manajemen Inventaris (E-Inventory)** berbasis web modern yang dibangun dengan arsitektur decoupled (frontend dan backend terpisah). 
 
-### 1. Authentication
-- Login menggunakan username & password
-- Token disimpan di database
-- Token disimpan di localStorage browser
-- Proteksi akses menggunakan Bearer Token
-
-### 2. Master Data (CRUD)
-- Data Items (Barang)
-  - Create item
-  - Read item
-  - Update item
-  - Delete item
-
-- Relasi data:
-  - Categories
-  - Suppliers
-
-### 3. Dashboard Admin
-- Sidebar navigation
-- Statistik jumlah items
-- Form untuk tambah, edit dan delete data
-- Form untuk tambah, edit dan delete suppliers/category
-
-### 4. Security
-- Authorization Bearer Token
-- AuthFilter pada CodeIgniter 4
-- Proteksi endpoint POST, PUT, DELETE
+Aplikasi ini dirancang untuk melacak ketersediaan stok barang gudang, mengelompokkan kategori produk, melacak mitra supplier, merekam transaksi mutasi stok masuk & keluar secara real-time, serta mempermudah pesanan restock otomatis ke supplier melalui integrasi WhatsApp.
 
 ---
 
-## Struktur Database
+## 🛠️ Teknologi yang Digunakan
 
-### Users
-- id
-- username
-- password
-- token
+### Backend (RESTful API Server)
+- **PHP 8.2+**
+- **CodeIgniter 4** (sebagai penyedia RESTful API)
+- **MySQL / MariaDB** (basis data relasional)
+- **CORS & AuthFilter** (pengaman akses endpoint API)
+- **Token-based Authentication** (Bearer Token Session)
 
-### Categories
-- id
-- name
-
-### Suppliers
-- id
-- name
-
-### Items
-- id
-- category_id
-- supplier_id
-- item_name
-- stock
+### Frontend (SPA - Single Page Application)
+- **VueJS 3 (via CDN)**
+- **Vue Router 4 (via CDN)** (Hash-based history navigation)
+- **Axios** (HTTP Client dengan request & response interceptor otomatis)
+- **TailwindCSS (via CDN)** (styling antarmuka modern)
+- **SweetAlert2** (notifikasi interaktif & estetik)
+- **FontAwesome 6** (ikonografi)
 
 ---
 
-## Struktur Folder Project
+## 🌟 Fitur Utama Aplikasi
 
+### 1. Public Dashboard (Landing Page - Visitor/Owner View)
+- **Live Counter Widgets**: Menampilkan total jenis barang, jumlah unit stok, kategori aktif, dan supplier rekanan.
+- **Real-Time Catalog & Search**: Pencarian dan penyaringan barang berdasarkan kategori secara instan.
+- **Stock Level Progress Bar**: Indikator tingkat stok visual dengan peringatan **"Persediaan Menipis!"** jika stok berada di bawah batas kritis (≤ 5 unit).
+- **Auto-Scrolling Widgets**: Menampilkan 5 aktivitas transaksi terbaru dan grafik distribusi kategori yang bergulir otomatis (dapat dijeda saat kursor diarahkan ke widget).
+
+### 2. Admin Portal & Authentication
+- **Secure Portal**: Antarmuka login dengan desain glassmorphic premium.
+- **Bearer Token Security**: Token autentikasi unik disimpan secara dinamis ke database dan `localStorage` browser.
+- **Automatic Session Expiry Interceptor**: Apabila token tidak lagi valid (401 Unauthorized), sesi akan dibersihkan secara otomatis dan dialihkan kembali ke portal login.
+
+### 3. Master Data Management (CRUD - Protected)
+- **Dashboard Items (Barang)**: Tambah, edit, dan hapus data barang, lengkap dengan validasi relasi kategori & supplier.
+- **Kategori**: Tambah, edit, dan hapus pengelompokan produk.
+- **Supplier**: Mengelola informasi mitra pemasok, termasuk nomor telepon dan referensi kategori.
+
+### 4. Transaksi Stok (Timeline & Activity Feed)
+- Pencatatan transaksi aliran stok masuk (**Stock In**) dan keluar (**Stock Out**).
+- **Interactive Timeline**: Desain mutasi stok bergaya linimasa yang dipisah berdasarkan warna indikator (hijau untuk masuk, merah untuk keluar).
+- **Stock Protection**: Validasi otomatis yang memblokir transaksi keluar apabila jumlah unit melebihi stok fisik yang tersedia saat itu.
+
+### 5. Analisis & Laporan (Print-Ready Layout)
+- **Ratio Chart**: Visualisasi perbandingan rasio persentase kuantitas stok masuk vs stok keluar.
+- **Top Active Goods**: Daftar barang dengan frekuensi mutasi tertinggi.
+- **Printable Layout**: Fitur cetak fisik laporan inventaris yang secara otomatis merapikan tata letak, menyembunyikan navigasi sidebar, tombol, serta memunculkan seluruh data tabel penuh (no-pagination) saat proses cetak berjalan.
+
+### 6. Pengingat Stok & Whatsapp Integration
+- Deteksi otomatis barang dengan stok kritis (≤ 5 unit).
+- Tombol **"Restock via WhatsApp"** yang secara otomatis memformat pesan draf berisi nama barang, sisa unit, nama supplier, dan membuka tautan chat langsung ke nomor WhatsApp supplier yang bersangkutan.
+
+### 7. Profil Admin & Log Audit
+- Menampilkan informasi Super Admin, detail koneksi (User Agent, Client IP, SSL Status).
+- Form perubahan sandi administrator (simulasi).
+- **Security Audit Logs**: Daftar rekaman log audit keamanan sesi aktif.
+
+---
+
+## 🗄️ Struktur Database (`db_inventory`)
+
+### 1. `users` (Data Akun & Token Sesi)
+- `id` (int, Primary Key, Auto Increment)
+- `username` (varchar)
+- `password` (varchar, MD5)
+- `token` (varchar, Bearer Token)
+
+### 2. `categories` (Data Kategori)
+- `id` (int, Primary Key, Auto Increment)
+- `name` (varchar)
+
+### 3. `suppliers` (Data Supplier Partner)
+- `id` (int, Primary Key, Auto Increment)
+- `name` (varchar)
+- `phone` (varchar)
+- `category_id` (int)
+
+### 4. `items` (Data Master Barang)
+- `id` (int, Primary Key, Auto Increment)
+- `category_id` (int)
+- `supplier_id` (int)
+- `item_name` (varchar)
+- `stock` (int)
+
+### 5. `stock_mutations` (Riwayat Aliran Transaksi Stok)
+- `id` (int, Primary Key, Auto Increment)
+- `item_id` (int)
+- `type` (enum: `'in'`, `'out'`)
+- `quantity` (int)
+- `notes` (varchar)
+- `created_at` (datetime)
+
+---
+
+## 📂 Struktur Folder Proyek
+
+```text
+UAS_Web2_312210368_FadhlurohmanFN/
+│
+├── backend-api/                  # RESTful API Server (CodeIgniter 4)
+│   ├── app/
+│   │   ├── Config/               # Konfigurasi aplikasi & Routes
+│   │   ├── Controllers/          # Auth, Item, Category, Supplier, Stock
+│   │   ├── Filters/              # AuthFilter (Bearer Token Validator)
+│   │   └── Models/               # Model database CI4
+│   ├── public/                   # Entry point index.php
+│   └── .env                      # Environment settings (Database & BaseURL)
+│
+├── frontend-spa/                 # Single Page Application (VueJS 3 SPA)
+│   ├── components/               # Komponen Modular Halaman Vue
+│   │   ├── Home.js               # Halaman Publik Landing Page
+│   │   ├── Login.js              # Halaman Login
+│   │   ├── Dashboard.js          # CRUD Items
+│   │   ├── Categories.js         # CRUD Kategori
+│   │   ├── Suppliers.js          # CRUD Supplier
+│   │   ├── StockTransactions.js  # Aliran Transaksi Stok & Timeline
+│   │   ├── Reports.js            # Laporan & Cetak Fisik
+│   │   ├── Alerts.js             # Deteksi Kritis & WhatsApp Order
+│   │   ├── Profile.js            # Profil Admin & Security Logs
+│   │   └── NotFound.js           # Penanganan Halaman 404
+│   ├── index.html                # Main SPA Layout
+│   ├── style.css                 # Custom Styling & Visual Ambient Blobs
+│   ├── axios-setup.js            # Interceptors & Global BaseURL
+│   └── router.js                 # Konfigurasi Vue Router & Navigation Guards
+│
+└── gambar/                       # Aset Gambar & Dokumentasi Screenshot
 ```
-backend-api/
-│
-├── app/
-│ ├── Controllers/
-│ ├── Models/
-│ ├── Filters/
-│
-├── public/
-├── writable/
-└── .env
-
-frontend-spa/
-│
-├── index.html
-├── dashboard.html
-└── assets (optional)
-```
 
 ---
 
-## Cara Menjalankan Project
+## 🚀 Cara Menjalankan Aplikasi
 
-### Backend (CodeIgniter 4)
-1. Jalankan XAMPP (Apache + MySQL)
-2. Import database `db_inventory`
-3. Jalankan server: http://localhost:8080
+### 1. Konfigurasi Backend (API Server)
+1. Aktifkan modul **Apache** dan **MySQL** pada control panel XAMPP.
+2. Buat database baru bernama `db_inventory` melalui phpMyAdmin, kemudian import file SQL database Anda.
+3. Masuk ke dalam direktori `backend-api/` dan pastikan file `.env` sudah terkonfigurasi dengan benar:
+   ```env
+   database.default.hostname = localhost
+   database.default.database = db_inventory
+   database.default.username = root
+   database.default.password = 
+   database.default.DBDriver = MySQLi
+   ```
+4. Jalankan server lokal CodeIgniter 4 melalui Command Prompt:
+   ```bash
+   php spark serve
+   ```
+   *API server akan berjalan secara default di alamat:* `http://localhost:8080`
 
----
-
-### Frontend (Vue SPA)
-1. Buka file: frontend-spa/index.html
-2. Login menggunakan: username: admin password: 123456
-3. Setelah login akan diarahkan ke dashboard
-
----
-
-## Endpoint API
-
-### Authentication
-**1. POST /login**
-<img src="gambar/postman login.png">
-
-### Items
-**2. GET /items**
-<img src="gambar/get items.png">
-
-**3. POST /items**
-<img src="gambar/put items.png">
-
-**4. PUT /items/{id}**
-<img src="gambar/put items.png">
-
-**5. DELETE /items/{id}**
-<img src="gambar/delete items.png">
-
-### Categories
-**1. GET /categories**
-<img src="gambar/get categories.png">
-
-### Suppliers
-**1. GET /suppliers**
-<img src="gambar/get suppliers.png">
+### 2. Menjalankan Frontend (SPA)
+1. Karena aplikasi ini merupakan Single Page Application murni menggunakan CDN, Anda cukup membuka file `frontend-spa/index.html` langsung pada peramban web (browser) favorit Anda, atau menjalankannya melalui extension *Live Server* pada VS Code.
+2. Akses halaman login dengan mengklik tombol **Login Admin** di pojok kanan atas.
+3. Gunakan kredensial default untuk masuk:
+   - **Username**: `admin`
+   - **Password**: `123456`
+4. Setelah sukses terautentikasi, Anda akan otomatis dialihkan ke dalam Admin Panel Dashboard.
 
 ---
 
-## Header Authorization
-**1. Authorization: Bearer <"e4156e5aebdc2da5b13a864bd13964a921f7b0740085c71291cddd5a0e202055">**
-<img src="gambar/Header Authorization.png">
+## 🔗 Endpoint API Utama
+
+| Method | Endpoint | Deskripsi | Proteksi |
+| :--- | :--- | :--- | :--- |
+| **POST** | `/login` | Otentikasi admin & generate token sesi | Publik |
+| **GET** | `/items` | Menampilkan seluruh katalog barang | Publik |
+| **POST** | `/items` | Menambahkan data barang baru | Bearer Token |
+| **PUT** | `/items/(:num)` | Memperbarui data barang berdasarkan ID | Bearer Token |
+| **DELETE** | `/items/(:num)` | Menghapus data barang berdasarkan ID | Bearer Token |
+| **GET** | `/categories` | Menampilkan seluruh kategori barang | Publik |
+| **POST** | `/categories` | Menambahkan kategori baru | Bearer Token |
+| **PUT** | `/categories/(:num)` | Memperbarui kategori berdasarkan ID | Bearer Token |
+| **DELETE** | `/categories/(:num)` | Menghapus kategori berdasarkan ID | Bearer Token |
+| **GET** | `/suppliers` | Menampilkan seluruh supplier rekanan | Publik |
+| **POST** | `/suppliers` | Menambahkan supplier baru | Bearer Token |
+| **PUT** | `/suppliers/(:num)` | Memperbarui supplier berdasarkan ID | Bearer Token |
+| **DELETE** | `/suppliers/(:num)` | Menghapus supplier berdasarkan ID | Bearer Token |
+| **GET** | `/stocks` | Menampilkan seluruh riwayat mutasi stok | Publik |
+| **POST** | `/stocks` | Mencatat transaksi mutasi stok baru | Bearer Token |
 
 ---
 
-## Screenshot yang Wajib Dilampirkan
-**1. Halaman login**
-<img src="gambar/halaman login.png">
+## 📸 Dokumentasi & Screenshot Aplikasi
 
-**2. Dashboard admin**
-<img src="gambar/dashboard admin.png">
+### 1. Halaman Dashboard Publik (Katalog Live & Auto-Scrolling Feed)
+<img src="gambar/landing page.jpeg" alt="Public Dashboard">
 
-**3. Tabel items**
-<img src="gambar/dashboard item.png">
+### 2. Panel Admin Dashboard (CRUD Data Master Items)
+<img src="gambar/admin panel.jpeg" alt="Admin Panel Items">
 
-**4. Tambah/edit data**
+### 3. Tambah, Edit Data Barang & Delete Barang
+- **Form Tambah Barang**:
+  <img src="gambar/tambah item.jpeg" alt="Tambah Item">
+- **Form Edit Barang**:
+  <img src="gambar/edit item.jpeg" alt="Edit Item">
+- **Konfirmasi Hapus Barang**:
+  <img src="gambar/hapus item.jpeg" alt="Hapus Item">
 
-<img src="gambar/tambah item.png">
-<img src="gambar/edit item.png">
+### 4. Pengujian API via Postman (Login & Bearer Token Authorization)
+- **Login RESTful API (Success)**:
+  <img src="gambar/postman login.png" alt="Postman Login Success">
+- **Header Bearer Token Authorization**:
+  <img src="gambar/Header Authorization.png" alt="Postman Header Token">
 
-**5. Postman login (success)**
-<img src="gambar/postman login.png">
+### 5. Pengamanan Endpoint Terproteksi (401 Unauthorized)
+<img src="gambar/postman request tanpa token (401 Unauthorized).png" alt="401 Unauthorized">
 
-**6. Postman request tanpa token (401 Unauthorized)**
-<img src="gambar/postman request tanpa token (401 Unauthorized).png">
+### 6. Struktur Database phpMyAdmin (`db_inventory`)
+<img src="gambar/struktur database phpmyadmin.png" alt="Struktur Database">
 
-**7. Struktur database phpMyAdmin**
-<img src="gambar/struktur database phpmyadmin.png">
+## Link Demo : https://fadhlurohman.github.io/UAS_Web2_312210368_FadhlurohmanFN/
 
----
-
-## Link Video Presentasi
+## Link Video YouTube: 
