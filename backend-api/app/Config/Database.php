@@ -200,5 +200,24 @@ class Database extends Config
         if (ENVIRONMENT === 'testing') {
             $this->defaultGroup = 'tests';
         }
+
+        // Konfigurasi database otomatis jika file .env terhapus/diblokir oleh server gratisan
+        if (ENVIRONMENT !== 'testing') {
+            $isLocal = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1', '[::1]']) 
+                || (isset($_SERVER['SERVER_NAME']) && ($_SERVER['SERVER_NAME'] === 'localhost' || $_SERVER['SERVER_NAME'] === '127.0.0.1'));
+            
+            if (!$isLocal) {
+                $this->default['hostname'] = 'sql109.infinityfree.com';
+                $this->default['database'] = 'if0_42237580_einventory';
+                $this->default['username'] = 'if0_42237580';
+                $this->default['password'] = 'fadhlurohman1'; // Ganti dengan password vPanel Anda
+            } else {
+                // Paksa gunakan database lokal saat dijalankan di localhost
+                $this->default['hostname'] = 'localhost';
+                $this->default['database'] = 'db_inventory';
+                $this->default['username'] = 'root';
+                $this->default['password'] = '';
+            }
+        }
     }
 }

@@ -8,8 +8,9 @@
  * Harus di-load SEBELUM router.js (agar window.appRouter tersedia saat interceptor berjalan)
  */
 
-// ── 1. Base URL ──────────────────────────────────────────────────────────────
-axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.baseURL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:8080'
+    : window.location.origin + '/api';
 
 // ── 2. Request Interceptor ───────────────────────────────────────────────────
 // Menyuntikkan Authorization header ke SETIAP request secara otomatis

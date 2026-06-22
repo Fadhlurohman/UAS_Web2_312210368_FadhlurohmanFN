@@ -3,6 +3,8 @@
 - **Nama:** Fadhlurohman Fatikh Navintino
 - **NIM:** 312210368
 - **Mata Kuliah:** Pemrograman Web 2 (UAS)
+- **Link Demo:** [http://uasweb2.infinityfree.io/](http://uasweb2.infinityfree.io/)
+- **Link Video YouTube:** [Silakan masukkan link video presentasi YouTube Anda di sini]
 
 ---
 
@@ -144,6 +146,8 @@ UAS_Web2_312210368_FadhlurohmanFN/
 ## 🚀 Cara Menjalankan Aplikasi
 
 ### 1. Konfigurasi Backend (API Server)
+
+#### A. Dijalankan Secara Lokal (Local Development)
 1. Aktifkan modul **Apache** dan **MySQL** pada control panel XAMPP.
 2. Buat database baru bernama `db_inventory` melalui phpMyAdmin, kemudian import file SQL database Anda.
 3. Masuk ke dalam direktori `backend-api/` dan pastikan file `.env` sudah terkonfigurasi dengan benar:
@@ -160,13 +164,27 @@ UAS_Web2_312210368_FadhlurohmanFN/
    ```
    *API server akan berjalan secara default di alamat:* `http://localhost:8080`
 
+#### B. Dijalankan di Hosting Produksi (InfinityFree / Live Hosting)
+Backend API didesain untuk mendeteksi lingkungan hosting secara otomatis pada file [Database.php](file:///c:/Fadhlurohman/UAS_Web2_312210368_FadhlurohmanFN/backend-api/app/Config/Database.php). Jika dijalankan di server luar (non-localhost), aplikasi akan otomatis menggunakan kredensial database hosting:
+- **Hostname Database**: `sql109.infinityfree.com`
+- **Nama Database**: `if0_42237580_einventory`
+- **Username**: `if0_42237580`
+- **Password**: *Password vPanel akun InfinityFree Anda*
+
 ### 2. Menjalankan Frontend (SPA)
-1. Karena aplikasi ini merupakan Single Page Application murni menggunakan CDN, Anda cukup membuka file `frontend-spa/index.html` langsung pada peramban web (browser) favorit Anda, atau menjalankannya melalui extension *Live Server* pada VS Code.
-2. Akses halaman login dengan mengklik tombol **Login Admin** di pojok kanan atas.
-3. Gunakan kredensial default untuk masuk:
+
+#### A. Dijalankan Secara Lokal (Local Development)
+1. Karena aplikasi ini merupakan Single Page Application murni menggunakan CDN, Anda cukup membuka file `frontend-spa/index.html` langsung pada peramban web (browser) Anda, atau menjalankannya melalui extension *Live Server* pada VS Code.
+2. API Base URL akan otomatis terarah ke `http://localhost:8080` lewat deteksi hostname pada file [axios-setup.js](file:///c:/Fadhlurohman/UAS_Web2_312210368_FadhlurohmanFN/frontend-spa/axios-setup.js).
+
+#### B. Dijalankan di Hosting Produksi (InfinityFree / Live Hosting)
+1. Unggah seluruh isi folder `frontend-spa` ke direktori publik hosting (seperti `htdocs`).
+2. API Base URL otomatis berubah mengarah ke path `/api` dari domain hosting (e.g. `http://uasweb2.infinityfree.io/api`) menggunakan pendeteksian otomatis di [axios-setup.js](file:///c:/Fadhlurohman/UAS_Web2_312210368_FadhlurohmanFN/frontend-spa/axios-setup.js).
+3. Akses halaman login dengan mengklik tombol **Login Admin** di pojok kanan atas.
+4. Gunakan kredensial default untuk masuk:
    - **Username**: `admin`
    - **Password**: `123456`
-4. Setelah sukses terautentikasi, Anda akan otomatis dialihkan ke dalam Admin Panel Dashboard.
+5. Setelah sukses terautentikasi, Anda akan otomatis dialihkan ke dalam Admin Panel Dashboard.
 
 ---
 
@@ -194,32 +212,54 @@ UAS_Web2_312210368_FadhlurohmanFN/
 
 ## 📸 Dokumentasi & Screenshot Aplikasi
 
-### 1. Halaman Dashboard Publik (Katalog Live & Auto-Scrolling Feed)
-<img src="gambar/landing page.jpeg" alt="Public Dashboard">
+Di bawah ini adalah dokumentasi visual aplikasi yang dikelompokkan ke dalam beberapa bagian. Klik pada masing-masing bagian untuk menampilkan screenshot/gambar:
 
-### 2. Panel Admin Dashboard (CRUD Data Master Items)
-<img src="gambar/admin panel.jpeg" alt="Admin Panel Items">
+<details>
+  <summary><b>🖥️ 1. Antarmuka Aplikasi (Dashboard Publik & Admin Panel)</b></summary>
+  <br>
+  
+  #### Halaman Dashboard Publik (Katalog Live & Auto-Scrolling Feed)
+  <img src="gambar/landing page.jpeg" alt="Public Dashboard">
+  
+  #### Panel Admin Dashboard (CRUD Data Master Items)
+  <img src="gambar/admin panel.jpeg" alt="Admin Panel Items">
+</details>
 
-### 3. Tambah, Edit Data Barang & Delete Barang
-- **Form Tambah Barang**:
+<details>
+  <summary><b>📦 2. Manajemen Data Barang (Aktivitas CRUD)</b></summary>
+  <br>
+  
+  #### Form Tambah Barang
   <img src="gambar/tambah item.jpeg" alt="Tambah Item">
-- **Form Edit Barang**:
+  
+  #### Form Edit Barang
   <img src="gambar/edit item.jpeg" alt="Edit Item">
-- **Konfirmasi Hapus Barang**:
+  
+  #### Konfirmasi Hapus Barang
   <img src="gambar/hapus item.jpeg" alt="Hapus Item">
+</details>
 
-### 4. Pengujian API via Postman (Login & Bearer Token Authorization)
-- **Login RESTful API (Success)**:
+<details>
+  <summary><b>🔒 3. Pengujian API via Postman (Autentikasi & Keamanan)</b></summary>
+  <br>
+  
+  #### Login RESTful API (Success)
   <img src="gambar/postman login.png" alt="Postman Login Success">
-- **Header Bearer Token Authorization**:
+  
+  #### Header Bearer Token Authorization
   <img src="gambar/Header Authorization.png" alt="Postman Header Token">
+  
+  #### Pengamanan Endpoint Terproteksi (401 Unauthorized)
+  <img src="gambar/postman request tanpa token (401 Unauthorized).png" alt="401 Unauthorized">
+</details>
 
-### 5. Pengamanan Endpoint Terproteksi (401 Unauthorized)
-<img src="gambar/postman request tanpa token (401 Unauthorized).png" alt="401 Unauthorized">
-
-### 6. Struktur Database phpMyAdmin (`db_inventory`)
-<img src="gambar/struktur database phpmyadmin.png" alt="Struktur Database">
-
-## Link Demo : https://fadhlurohman.github.io/UAS_Web2_312210368_FadhlurohmanFN/
-
-## Link Video YouTube: 
+<details>
+  <summary><b>🗄️ 4. Struktur Database & Skema Relasi (ERD)</b></summary>
+  <br>
+  
+  #### Struktur Database phpMyAdmin (`db_inventory`)
+  <img src="gambar/struktur database.png" alt="Struktur Database">
+  
+  #### Skema Relasi Database (ERD)
+  <img src="gambar/relasi erd.png" alt="Skema Relasi Database">
+</details>
