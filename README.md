@@ -4,7 +4,7 @@
 - **NIM:** 312210368
 - **Mata Kuliah:** Pemrograman Web 2 (UAS)
 - **Link Demo:** [http://uasweb2.infinityfree.io/](http://uasweb2.infinityfree.io/)
-- **Link Video YouTube:** 
+- **Link Video YouTube:** https://youtu.be/pl76_OyUBDk
 
 ---
 
